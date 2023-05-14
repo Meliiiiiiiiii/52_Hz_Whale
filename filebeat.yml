@@ -1,0 +1,10 @@
+filebeat.modules:
+- module: suricata
+  eve:
+    enabled: true
+    var.paths: ["/usr/share/filebeat/logs/eve.json"]
+
+output.elasticsearch:
+  hosts: ["http://elasticsearch:9200"]
+  username: elastic
+  password: secret

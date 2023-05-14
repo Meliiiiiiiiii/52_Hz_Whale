@@ -1,0 +1,57 @@
+version: "3"
+services:
+  suricata:
+    image: jasonish/suricata:latest
+    #do change the ethernet interface as needed
+    command: "-i ens33"
+    network_mode: host
+    cap_add:
+      - net_admin
+      - net_raw
+      - sys_nice
+    volumes:
+      - "${PWD}/logs:/var/log/suricata"
+
+  elasticsearch:
+    image: elasticsearch:7.17.10
+    container_name: elasticsearch
+    ports:
+      - "9200:9200"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - xpack.security.audit.enabled=true
+      - xpack.security.authc.api_key.enabled=true
+      - ELASTIC_PASSWORD=secret
+        
+  kibana:
+    image: kibana:7.17.10
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    environment:
+      - ELASTICSEARCH_URL=http://localhost:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=secret
+      - xpack.reporting.enabled=false
+
+  filebeat:
+    user: root
+    image: elastic/filebeat:7.17.10
+    container_name: filebeat
+    volumes:
+      - "${PWD}/logs/eve.json:/usr/share/filebeat/logs/eve.json:ro"
+      - "${PWD}/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
+    environment:
+      - ELASTICSEARCH_URL=http://localhost:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=secret
+      - KIBANA_HOST=http://kibana:5601
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    command: --strict.perms=false
+    depends_on:
+      - elasticsearch
+      - kibana
+    restart: always

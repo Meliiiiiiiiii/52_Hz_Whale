@@ -1,0 +1,23 @@
+version: '3'
+services:
+  modbus_server_502:
+    image: mbserver
+    ports:
+      - "502:502"
+
+  modbus_server_503:
+    image: mbserver
+    ports:
+      - "503:502"
+
+  modbus_server_504:
+    image: mbserver
+    ports:
+      - "504:502"
+
+networks:
+  static_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16

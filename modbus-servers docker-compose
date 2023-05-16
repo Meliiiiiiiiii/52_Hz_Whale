@@ -2,16 +2,25 @@ version: '3'
 services:
   modbus_server_502:
     image: mbserver
+    network:
+      static_network:
+      ipv4_address: 172.21.0.2
     ports:
       - "502:502"
 
   modbus_server_503:
     image: mbserver
+    network:
+      static_network:
+      ipv4_address: 172.21.0.2
     ports:
       - "503:502"
 
   modbus_server_504:
     image: mbserver
+    network:
+      static_network:
+      ipv4_address: 172.21.0.2
     ports:
       - "504:502"
 
